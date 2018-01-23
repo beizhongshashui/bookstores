@@ -1,6 +1,7 @@
 from django.db import models
 from db.base_model import BaseModel
 from hashlib import sha1
+
 # Create your models here
 
 
@@ -21,10 +22,17 @@ class PassportManager(models.Manager):
 		'''根据用户密码查询账户'''
 		try:
 			passport = self.get(username=username,password=get_hash(password))
-		except self.model.DoseNotExist:
+		except self.model.DoesNotExist:
 			'''账户不许存在'''
 			passport = None
 		return passport
+
+	def check_passport(self, username):
+		try:
+			passport = self.get(username =username)
+		except self.model.DoseNotExist:
+			passport = None
+		return  passport
 
 		
 
@@ -32,7 +40,7 @@ class PassportManager(models.Manager):
 class Passport(BaseModel):
 	"""docstring for Passport"""
 	username = models.CharField(max_length=20,verbose_name='用户名')
-	password = models.CharField(max_length = 20,verbose_name='用户密码')
+	password = models.CharField(max_length = 100,verbose_name='用户密码')
 	email = models.EmailField(verbose_name='邮箱')
 	is_avtive = models.BooleanField(default=False ,verbose_name = '激活状态')
 
