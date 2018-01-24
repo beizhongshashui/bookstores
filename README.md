@@ -150,3 +150,112 @@ mysql> create database bookstore;
 $ python manage.py makemigrations users
 $ python manage.py migrate
 ```
+
+## 2，用户系统前端模板编写
+接下来我们要将前端模板写一下，先建一个模板文件夹。
+```
+$ mkdir templates
+```
+我们第一个实现的功能是渲染注册页。将register.html拷贝到templates/users。
+将js，css，images文件夹拷贝到static文件夹下。作为静态文件。
+接下来我们将程序跑起来。看到了Django的欢迎页面。
+```
+$ python manage.py runserver 9000
+```
+然后呢？我们想把register.html渲染出来。我们先来看views.py这个视图文件。
+```
+# users/views.py
+def register(request):
+    '''显示用户注册页面'''
+    return render(request, 'users/register.html')
+```
+然后我们将url映射做好。主应用的urls.py为
+```
+# bookstore/urls.py
+urlpatterns = [
+    url(r'^admin/', include(admin.site.urls)),
+    url(r'^user/', include('users.urls', namespace='user')), # 用户模块
+]
+```
+'^'表示只匹配user为开头的url。
+然后在users app里面的urls配置url映射。
+```
+# users/urls.py
+from django.conf.urls import url
+from users import views
+
+urlpatterns = [
+    url(r'^register/$', views.register, name='register'), # 用户注册
+]
+```
+将templates的路径写入配置文件中。
+```
+# settings.py
+TEMPLATES = [
+    {
+        ...
+        'DIRS': [os.path.join(BASE_DIR, 'templates')], # 这里别忘记配置！
+        ...
+    },
+]
+```
+我们可以看到静态文件没有加载出来，所以我们要改一下html文件中的路径。将静态文件的路径前面加上'/static/'
+然后在配置文件中加入调试时使用的静态文件目录。
+```
+# settings.py
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+] # 调试时使用的静态文件目录
+```
+好。我们渲染注册页的任务就完成了。
+
+
+
+## 3，注册页面表单提交功能
+接下来我们要编写注册页面的提交表单功能。
+1，接受前端传过来的表单数据。
+2，校验数据。
+3，写入数据库。
+4，返回注册页（因为还没做首页）。
+```
+# users/views.py
+def register_handle(request):
+    '''进行用户注册处理'''
+    # 接收数据
+    username = request.POST.get('user_name')
+    password = request.POST.get('pwd')
+    email = request.POST.get('email')
+
+    # 进行数据校验
+    if not all([username, password, email]):
+        # 有数据为空
+        return render(request, 'users/register.html', {'errmsg':'参数不能为空!'})
+
+    # 判断邮箱是否合法
+    if not re.match(r'^[a-z0-9][\w\.\-]*@[a-z0-9\-]+(\.[a-z]{2,5}){1,2}$', email):
+        # 邮箱不合法
+        return render(request, 'users/register.html', {'errmsg':'邮箱不合法!'})
+
+    # 进行业务处理:注册，向账户系统中添加账户
+    # Passport.objects.create(username=username, password=password, email=email)
+    passport = Passport.objects.add_one_passport(username=username, password=password, email=email)
+
+    # 注册完，还是返回注册页。
+    return redirect(reverse('user:register'))
+```
+配置urls.py
+```
+# users/urls.py
+url(r'^register_handle/$', views.register_handle, name='register_handle'), # 用户注册处理
+```
+前端使用Form来发送POST请求。
+```
+<form method="post" action="/user/register_handle/">
+```
+注意添加csrf_token以及错误信息
+```
+{% csrf_token %}
+{{errmsg}}
+```
+然后就完成注册功能了。之后需要实现发送激活邮件。
+
