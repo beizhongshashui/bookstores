@@ -20,7 +20,7 @@ class BooksManager(models.Manager):
         else:
             order_by = ('-pk',)#按照primary key 降顺排序
 
-        books_li = self.filter(type_id = type_id).order_by(*oerder_by)
+        books_li = self.filter(type_id = type_id).order_by(*order_by)
 
         if limit:
             books_li =books_li[:limit]
@@ -33,8 +33,14 @@ class BooksManager(models.Manager):
         except self.model.DoesNotExist:
             books =None
         return books
+    def add_book(self,type_id,name,desc,unit,price,stock,sales,detail,image,status):
+        
+        book = self.create(type_id=type_id,name=name,desc=desc,unit=unit,price=price,
+            stock =stock,sales =sales,detail=detail,image=image,status=status)
 
+        return book
 
+  
 
 
 
@@ -44,7 +50,7 @@ class Books(BaseModel):
     status_choices = ((k,v) for k,v in STATUS_CHOICE.items())
     type_id = models.SmallIntegerField(default=PYTHON,choices = books_type_choices,verbose_name='商品种类')
     name = models.CharField(max_length=20,verbose_name='商品名称')
-    desc= models.CharField(max_length=128,verbose_name = '商品价格')
+    desc= models.CharField(max_length=128,verbose_name = '商品简介')
     unit = models.CharField(max_length = 20,verbose_name = '商品单位')
     price = models.DecimalField(max_digits = 10,decimal_places=2,verbose_name='商品价格')
     stock = models.IntegerField(default=1,verbose_name = '商品库存')
