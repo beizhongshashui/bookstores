@@ -18,7 +18,7 @@ class PassportManager(models.Manager):
 		passport = self.create(username = username,password=get_hash(password),email=email)
 
 		return passport
-	def get_ont_passport(self,username,password):
+	def get_one_passport(self,username,password):
 		'''根据用户密码查询账户'''
 		try:
 			passport = self.get(username=username,password=get_hash(password))

@@ -1,0 +1,48 @@
+{% load staticfiles%}
+
+
+
+<script src = "{% static 'js/jquery-1.12.4.min.js'%}"></script>
+	<script>
+		$(function(){
+
+			$('#btnLogin').click(function(){
+
+				username = $('#username').val()
+				password = $('#pwd').val()
+				csrf = $('input[name="csrfmiddlewaretoken"]').val()
+
+				remember = $('input[name="remember"]').prop('checked')
+
+				params = {'username':username,'password':password,
+						'csrfmiddlewaretoken':csrf,'remember':remember
+						}
+						
+				$.post('/user/login_check/',params,function(data){
+
+					//请求成功
+					if(data.res ==0){
+
+						$('#username').next().html('用户名错误').show()
+					}
+					else{
+
+						location.href = data.next_url
+					}
+				})
+
+			})
+
+		})
+
+</script>
+{% csrf_token %}
+<input type="text" id = "username" class="name_input" value= "{{ username }}" placeholder="输入用户名">
+<div class="user_error">输入错误</div>
+<input type="password" id="pwd" class="pass_input" placeholder="请输入密码">
+<div class="more_input clearfox">
+    <input type="checkbox" name="remember" {{ checked  }}>
+    <label>请记住用户名</label>
+    <a href="#">忘记密码</a>>
+</div>
+<input type="button" id="btnLogin" value="登录" class="input_submit">

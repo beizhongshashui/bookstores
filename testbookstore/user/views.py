@@ -4,12 +4,10 @@ from django.http import HttpResponse
 import re
 from user.models import Passport
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-
+from django.http import JsonResponse
 # Create your views here.s
 
 def register(request):
-
-
 
 	return render(request,'users/register.html')
 
@@ -35,11 +33,55 @@ def  register_handle(request):
 		#进行业务注册
 		passport = Passport.objects.add_one_passport(username=username,password=password,email=email)
 
-		return redirect(reverse('user:register'))
+		return redirect(reverse('books:index'))
 		# return render(request,'uers/register.html',{'errmsg':'用户名已經存在。。。。'})
 
+def login(request):
+	username = ''
+	checked = ''
+	context = {
 
-	# else :
-	# 	pass
+		'username' :username,
+		'checked':checked,
+	}
+	return render(request,'users/login.html',context)
 
-	# return HttpResponse('ok')
+def login_check(request):
+	'''进行用户检查'''
+	username = request.POST.get('username')
+	password = request.POST.get('password')
+	remember = request.POST.get('remember')
+
+	if not all([username,password,remember]):
+		return JsonResponse({'res':2})
+
+	passport = Passport.objects.get_one_passport(username=username,
+		password=password)
+
+	if passport:
+		'''用户名正确'''
+		#构建给前端的的数据
+		next_url = request.session.get('url_path',reverse('books:index'))
+		jres = JsonResponse({'res':1,'next_url':next_url})
+
+		if remember =='true':
+			jres.set_cookie('username',username,max_age=7*24*3600)
+
+		else :
+			jres.delete_cookie('username')
+
+		request.session['islogin'] = True
+		request.session['username'] = username
+		request.session['passport_id'] = passport.id
+
+		return jres
+
+	else:
+		return JsonResponse({'res':0})
+def logout(request):
+    '''用户退出登录'''
+    # 清空用户的session信息
+    request.session.flush()
+    # 跳转到首页
+    return redirect(reverse('books:index'))
+
