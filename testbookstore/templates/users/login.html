@@ -1,8 +1,9 @@
-{% load staticfiles%}
+{% extends 'base.html'%}
 
-
-
-<script src = "{% static 'js/jquery-1.12.4.min.js'%}"></script>
+{% block title %}尚硅谷书城-登录{% endblock %}
+{% load staticfiles %}
+{% block body %}
+{% block buycart %}	{% endblock %}
 	<script>
 		$(function(){
 
@@ -34,15 +35,41 @@
 			})
 
 		})
+}
 
 </script>
 {% csrf_token %}
-<input type="text" id = "username" class="name_input" value= "{{ username }}" placeholder="输入用户名">
-<div class="user_error">输入错误</div>
-<input type="password" id="pwd" class="pass_input" placeholder="请输入密码">
-<div class="more_input clearfox">
-    <input type="checkbox" name="remember" {{ checked  }}>
-    <label>请记住用户名</label>
-    <a href="#">忘记密码</a>>
-</div>
-<input type="button" id="btnLogin" value="登录" class="input_submit">
+
+
+<div class="login_top clearfix">
+		<a href="index.html" class="login_logo"><img src={% static 'books/images/logo.png' %} style="width: 160px; height: 53px;"></a>	
+	</div>
+
+	<div class="login_form_bg">
+		<div class="login_form_wrap clearfix">
+			<div class="login_banner fl"></div>
+			<div class="slogan fl">技术书城</div>
+			<div class="login_form fr">
+				<div class="login_title clearfix">
+					<h1>用户登录</h1>
+					<a href="#">立即注册</a>
+				</div>
+				<div class="form_input">
+					
+				<input type="text" id="username" class="name_input" placeholder="请输入用户名">
+				<div class="user_error">输入错误</div>
+				<input type="password" id="pwd" class="pass_input" placeholder="请输入密码">
+				<div class="pwd_error">输入错误</div>
+				<div class="more_input clearfix">
+					<input type="checkbox" name="remember">
+					<label>记住用户名</label>
+					<a href="#">忘记密码</a>
+				</div>
+				<input type="submit" id="btnLogin" value="登录" class="input_submit">
+					
+				</div>
+			</div>
+		</div>
+	</div>
+
+{% endblock %}

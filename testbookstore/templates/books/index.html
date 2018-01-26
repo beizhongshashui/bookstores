@@ -1,58 +1,7 @@
+{% extends 'base.html'%}
 {% load staticfiles %}
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-<head>
-	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-	<title>尚硅谷书城-首页</title>
-	<link rel="stylesheet" type="text/css" href="/static/books/css/reset.css">
-	<link rel="stylesheet" type="text/css" href="/static/books/css/main.css">
-	<script type="text/javascript" src="/static/books/js/jquery-1.12.4.min.js"></script>
-	<script type="text/javascript" src="/static/books/js/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="/static/books/js/slide.js"></script>
-</head>
-<body>
-	<div class="header_con">
-		<div class="header">
-			<div class="welcome fl">欢迎来到尚硅谷书城!</div>
-			
-			{% if request.session.islogin %}
-				<div class="login_btn fl">
-				    欢迎您：<em>{{ request.session.username }}</em>
-				    <span>|</span>
-				    <a href="{% url 'user:logout' %}">退出</a>
-				</div>
-				{% else %}
-				<div class="login_btn fl">
-
-				    <a href="{% url 'user:login' %}">登录</a>
-				    <span>|</span>
-				    <a href="{% url 'user:register' %}">注册</a>
-				</div>
-				{% endif %}
-
-				<div class="user_link fl">
-					<span>|</span>
-					<a href="user_center_info.html">用户中心</a>
-					<span>|</span>
-					<a href="cart.html">我的购物车</a>
-					<span>|</span>
-					<a href="user_center_order.html">我的订单</a>
-				</div>
-			</div>
-		</div>		
-	</div>
-
-	<div class="search_bar clearfix">
-		<a href="index.html" class="logo fl"><img src="/static/books/images/logo.png" style="width: 160px; height: 53px;"></a>
-		<div class="search_con fl">
-			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
-			<input type="button" class="input_btn fr" name="" value="搜索">
-		</div>
-		<div class="guest_cart fr">
-			<a href="#" class="cart_name fl">我的购物车</a>
-			<div class="book_count fl" id="show_count">1</div>
-		</div>
-	</div>
+{% block body %}
+{% block title %}书城首页{% endblock %}
 
 	<div class="navbar_con">
 		<div class="navbar">
@@ -78,8 +27,8 @@
 		</ul>
 		<div class="slide fl">
 			<ul class="slide_pics">
-				<li><img src="/static/books/images/slide.jpg" alt="幻灯片" style="width: 760px; height: 270px;"></li>
-				<li><img src="/static/books/images/slide02.jpg" alt="幻灯片" style="width: 760px; height: 270px;"></li>
+				<li><img src= {% static 'books/images/slide.jpg'%} alt="幻灯片" style="width: 760px; height: 270px;"></li>
+				<li><img src={% static 'books/images/slide02.jpg' %} alt="幻灯片" style="width: 760px; height: 270px;"></li>
 				<li><img src="/static/books/images/slide03.jpg" alt="幻灯片" style="width: 760px; height: 270px;"></li>
 				<li><img src="/static/books/images/slide04.jpg" alt="幻灯片" style="width: 760px; height: 270px;"></li>
 			</ul>
@@ -104,11 +53,22 @@
 			</div>
 			<a href="#" class="book_more fr">查看更多 ></a>
 		</div>
-
+{% csrf_token %}
 		<div class="book_con clearfix">
 			<div class="book_banner fl"><img src="/static/books/images/banner01.jpg"></div>
 			<ul class="book_list fl">
+				{% for python_item in python_new%}
+
 				<li>
+					<h4><a href="/books/books/{{python_item.id}}/">{{ python_item.name }}</a></h4>
+					<a href="{% url 'books:detail' books_id=python_item.id %}"><img src={% static python_item.image %}></a>>
+					<div>{{python_item.id}}</div>
+					<div class="prize">¥ {{python_item.price}}</div>
+				</li>
+
+				{% endfor%}
+
+				<!-- <li>
 					<h4><a href="#">Python核心编程</a></h4>
 					<a href="#"><img src="/static/books/images/book001.jpg"></a>
 					<div class="prize">¥ 30.00</div>
@@ -122,7 +82,7 @@
 					<h4><a href="#">Python Cookbook</a></h4>
 					<a href="#"><img src="/static/books/images/book003.jpg"></a>
 					<div class="prize">¥ 3.90</div>
-				</li>
+				</li> -->
 				<li>
 					<h4><a href="#">Python高性能编程</a></h4>
 					<a href="#"><img src="/static/books/images/book004.jpg"></a>
@@ -326,18 +286,4 @@
 		</div>
 	</div>
 
-	<div class="footer">
-		<div class="foot_link">
-			<a href="#">关于我们</a>
-			<span>|</span>
-			<a href="#">联系我们</a>
-			<span>|</span>
-			<a href="#">招聘人才</a>
-			<span>|</span>
-			<a href="#">友情链接</a>		
-		</div>
-		<p>CopyRight © 2016 北京尚硅谷信息技术有限公司 All Rights Reserved</p>
-		<p>电话：010-****888    京ICP备*******8号</p>
-	</div>
-</body>
-</html>
+{% endblock %}

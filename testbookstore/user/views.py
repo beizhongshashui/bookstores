@@ -52,7 +52,10 @@ def login_check(request):
 	password = request.POST.get('password')
 	remember = request.POST.get('remember')
 
-	if not all([username,password,remember]):
+	print(remember)
+	print(password)
+	print(password)
+	if not all([username ,password,remember]):
 		return JsonResponse({'res':2})
 
 	passport = Passport.objects.get_one_passport(username=username,
@@ -62,6 +65,8 @@ def login_check(request):
 		'''用户名正确'''
 		#构建给前端的的数据
 		next_url = request.session.get('url_path',reverse('books:index'))
+		# next_url = reverse('books:index')
+		
 		jres = JsonResponse({'res':1,'next_url':next_url})
 
 		if remember =='true':
