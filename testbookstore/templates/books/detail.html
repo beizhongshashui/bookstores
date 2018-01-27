@@ -104,4 +104,35 @@
 		</div>
 	</div>
 
+	<script type='text/javascript'>
+		$(function(){
+			var $add_x = $('#add_cart').offset().left;
+			var $add_Y = $('#add_cart').offset().top;
+
+			var $to_x = $('#show_count').offset().top;
+			var $to_Y = $('#show_count').offset().left;
+
+			$(".add_jump").css({'left':add_x+50,'top':add_Y+10,'display':'block'})
+			$('#add_cart').click(function(){
+				$('.add_jump').stop().animate({
+					'left':$to_x,
+					'top':$to_Y},
+					'fast',function(){
+						$('.add_jump').fadeOut('fast',function(){
+							$('#show_count').html(1)
+						})
+
+					})
+
+
+			})
+
+
+
+
+		})
+
+
+	</script>>
+
 {% endblock %}
