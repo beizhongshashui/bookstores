@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'user',#用户模块
     'books',#商品模块
     'tinymce',
+    # 'cart',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -120,3 +121,19 @@ TINYMCE_DEFAULT_CONFIG = {
 
 }
 MEDIA_ROOT = os.path.join(BASE_DIR,'static')
+
+CACHES = {
+    "default":{
+        "BACKEND":'django_redis.cache.RedisCache',
+        "LOCATION":'REDIS://127.0.0.1:6379/2',
+        "OPTIONS":{
+                "CLIENT_CLASS":"django_redis.client.DefaultClient",
+                "PASSWORD":""
+        }
+    
+    }
+
+}
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"

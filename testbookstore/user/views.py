@@ -2,7 +2,7 @@ from django.shortcuts import render , redirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 import re
-from user.models import Passport
+from user.models import Passport,Address
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from django.http import JsonResponse
 # Create your views here.s
@@ -89,4 +89,20 @@ def logout(request):
     request.session.flush()
     # 跳转到首页
     return redirect(reverse('books:index'))
+
+
+def user(request):
+	'''用户中心'''
+	passport_id =request.session.get('passport_id')
+
+	addr = Address.objects.get_default_address(passport_id=passport_id)
+	book_list = []
+	context={
+	'addr':addr,
+	'book_list':book_list,
+	'page':'user'
+	}
+
+	return render(request,'users/user_center_info.html',context)
+
 
