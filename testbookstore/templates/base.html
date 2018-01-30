@@ -17,6 +17,7 @@
 	<div class="header_con">
 		<div class="header">
 			<div class="welcome fl">欢迎来到尚硅谷书城!</div>
+
 			
 			{% if request.session.islogin %}
 				<div class="login_btn fl">
@@ -37,7 +38,7 @@
 					<span>|</span>
 					<a href="{% url 'user:user' %}">用户中心</a>
 					<span>|</span>
-					<a href="cart.html">我的购物车</a>
+					<a href="{% url 'cart:show'%}">我的购物车</a>
 					<span>|</span>
 					<a href="user_center_order.html">我的订单</a>
 				</div>
@@ -46,20 +47,30 @@
 
 	
 		<div class="search_bar clearfix">
-		<a href="index.html" class="logo fl"><img src="/static/books/images/logo.png" style="width: 160px; height: 53px;"></a>
+		<a href="{% url 'books:index'%}" class="logo fl"><img src="/static/books/images/logo.png" style="width: 160px; height: 53px;"></a>
 		<div class="search_con fl">
 			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
 			<input type="button" class="input_btn fr" name="" value="搜索">
 		</div>
 		<div class="guest_cart fr">
-			<a href="cart.html" class="cart_name fl">我的购物车</a>
+			<a href="{% url 'cart:show'%}" class="cart_name fl">我的购物车</a>
 			<div class="book_count fl" id="show_count">1</div>
 		</div>
 	</div>
 	{% endblock %}
+{# 获取用户购物车中商品的数目 #}
+    {% block cart_count %}
+        <script>
+            $.get('/cart/count/', function (data) {
+                // {'res':商品的总数}
+                $('#show_count').html(data.res)
+            })
+        </script>
+    {% endblock cart_count %}
 {% block body %}
 {# 网页顶部主体模块#}
 {% endblock %}
+
 		<div class="footer">
 		<div class="foot_link">
 			<a href="#">关于我们</a>

@@ -46,7 +46,7 @@ def detail(request,books_id):
     books_list = Books.objects.get_books_by_type(type_id=books.type_id,limit=2,sort='new')
 
     context = {'books':books,'books_list':books_list}
-
+    # print('books_list',books_list)
     return render(request,'books/detail.html',context)
 
 

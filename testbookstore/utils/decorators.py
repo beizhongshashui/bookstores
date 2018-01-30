@@ -9,4 +9,5 @@ def login_required(view_func):
             return view_func(request,*args,**kwargs)
         else:
             return redirect(reverse('user:login'))
-           
+
+    return wapper           

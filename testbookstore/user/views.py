@@ -5,6 +5,7 @@ import re
 from user.models import Passport,Address
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from django.http import JsonResponse
+from utils.decorators import login_required
 # Create your views here.s
 
 def register(request):
@@ -90,7 +91,7 @@ def logout(request):
     # 跳转到首页
     return redirect(reverse('books:index'))
 
-
+@login_required
 def user(request):
 	'''用户中心'''
 	passport_id =request.session.get('passport_id')
@@ -102,7 +103,9 @@ def user(request):
 	'book_list':book_list,
 	'page':'user'
 	}
+	print('book_list',book_list)
 
 	return render(request,'users/user_center_info.html',context)
+	# return HttpResponse(book_list)
 
 

@@ -1,0 +1,111 @@
+{% extends 'base.html'%}
+{% load staticfiles %}
+{% block title %}购物车{% endblock %}
+{% block body%}
+		
+
+	<div class="total_count">全部商品<em>{{total_count}}</em>件</div>	
+	<ul class="cart_list_th clearfix">
+		<li class="col01">商品名称</li>
+		<li class="col02">商品单位</li>
+		<li class="col03">商品价格</li>
+		<li class="col04">数量</li>
+		<li class="col05">小计</li>
+		<li class="col06">操作</li>
+	</ul>
+	
+    {% for books in books_list %}
+<ul class="cart_list_td clearfix">
+	<li class="col01"><input type="checkbox" name="" checked></li>
+	<li class="col02"><img src="/static/books/images/book003.jpg"></li>
+	<span>{{ books.images }}</span>
+	<li class="col03">{{books.name}}<br><em>{{books.price}}</em></li>
+	<li class="col04">{{books.unit}}</li>
+		<li class="col05">{{books.price}}￥</li>
+		<li class="col06">
+			<div class="num_add">
+				<a href="javascript:;" class="add fl">+</a>
+				<input type="text" class="num_show fl" value="1">	
+				<a href="javascript:;" class="minus fl">-</a>	
+			</div>
+		</li>
+		</li>
+		<li class="col07">{{books.amount}}元</li>
+		<li class="col08"><a href="javascript:;">删除</a></li>
+</ul>
+    {% endfor%}
+<!-- 
+	<ul class="cart_list_td clearfix">
+		<li class="col01"><input type="checkbox" name="" checked></li>
+		<li class="col02"><img src="images/book/book003.jpg"></li>
+		<li class="col03">计算机程序设计艺术<br><em>100元</em></li>
+		<li class="col04">册</li>
+		<li class="col05">100元</li>
+		<li class="col06">
+			<div class="num_add">
+				<a href="javascript:;" class="add fl">+</a>
+				<input type="text" class="num_show fl" value="1">	
+				<a href="javascript:;" class="minus fl">-</a>	
+			</div>
+		</li>
+		<li class="col07">100元</li>
+		<li class="col08"><a href="javascript:;">删除</a></li>
+	</ul> -->
+	
+
+	<ul class="settlements">
+		<li class="col01"><input type="checkbox" name="" checked=""></li>
+		<li class="col02">全选</li>
+		<li class="col03">合计(不含运费)：<span>¥</span><em>{{total_price}}</em><br>共计<b>{{total_count}}</b>件商品</li>
+		<li class="col04"><a href="place_order.html">去结算</a></li>
+	</ul>
+{% endblock %}
+{% block bottom %}
+{#  js代码专用 #}
+
+<script >
+	$(function(){
+		updata_total_price()
+
+		function updata_total_price(){
+
+			total_count = 0
+			total_price = 0
+
+			$('.cart_list_td').find(':checked').parents('ul').eaah(function(){
+
+				ul_price_count =updata_books_ul($(this))
+				total_count += ul_price_count.books_count
+				total_price += ul_price_count.books_amount
+			})
+
+			$('.settlements').find('em').text(total_price.toFixed(2))
+			$('.settlements').find('b').text(total_count)
+
+
+		}
+		function updata_books_ul(books_ul){
+			total_price = books_ul.children('.col05').text()
+			books_count = books_ul.find('.num_show').val()
+
+			books_count = parseInt(books_count)
+			books_amount = parseFloat(total_price)*books_count
+
+
+			books_ul.children('.col07').text(books_amount.toFixed(2)+'yuan')
+
+			return {
+				'books_count':books_count,
+				'books_amount':books_amount
+			}
+		}
+		//更新页面上购物车商品总数
+
+
+	})
+
+
+</script>>
+
+
+{% endblock %}
