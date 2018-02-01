@@ -76,6 +76,7 @@ def cart_update(request):
     books_id = request.POST.get('books_id')
     books_count = request.POST.get('books_count')
 
+    print('cart_update-books_count :'+books_count)
     # 数据的校验
     if not all([books_id, books_count]):
         return JsonResponse({'res': 1, 'errmsg': '数据不完整'})
@@ -100,6 +101,8 @@ def cart_update(request):
     conn.hset(cart_key, books_id, books_count)
 
     return JsonResponse({'res': 5})
+
+    
 @login_required
 def cart_del(request):
     '''删除用户购物车中商品的信息'''
