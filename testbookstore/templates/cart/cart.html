@@ -50,23 +50,7 @@
 
 <script >
 	$(function(){
-		update_total_price()
-		// // 计算单个书本总价
-		//     function update_ul_total_price() {
-		//         // 获取商品的价格和数量
-		//         books_price = $('.show_pirze').children('em').text()
-		//         books_count = $('.num_show').val()
-		//         // 计算商品的总价
-		//         books_price = parseFloat(books_price)
-		//         books_count = parseInt(books_count)
-		//         total_price = books_price*books_count
-		//         // 设置商品总价
-		//         $('.total').children('em').text(total_price.toFixed(2) + '元')
-		//     }
-
-		   
-	
-		
+		update_total_price()		
 		error_update = false
 		function update_total_price(){
 
@@ -195,9 +179,30 @@
 $('.settlements').find(':checkbox').change(function(){
     //获取选中的checkbox 
     is_checked = $(this).prop('checked')
+
+    //遍历所有的checked 状态
+   
+    $('.cart_list_td').find(':checkbox').each(function(){
+    	
+    	$(this).prop('checked',is_checked)
+    })
+    update_total_price()
     
+})
 
+$('.cart_list_td').find(':checkbox').change(function(){
+	all_len = $('.cart_list_td').length
+	checked_len =$('.cart_list_td').find(':checked').length
+	console.log('checked_len:'+checked_len+"all_len :"+all_len)
+	
+	if(all_len == checked_len){
+		
+		$('.settlements').find(':checkbox').prop('checked',true)
+	}else{
+		$('.settlements').find(':checkbox').prop('checked',false)
+	}
 
+	update_total_price()
 })
 
 
@@ -238,11 +243,9 @@ function update_remote_cart_info(books_id,books_count){
   //           })
 	// 设置异步
 	$.ajaxSettings.async = true
-
-
-
-
 }
+
+
 
     $('.cart_list_td').children('.col08').children('a').click(function(){
     	
@@ -275,11 +278,14 @@ function update_remote_cart_info(books_id,books_count){
 
     		}
     	})
+
+
+
+
+
    　  })
 	
 	})
-
-
 
 
 </script>
