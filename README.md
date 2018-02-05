@@ -259,3 +259,170 @@ url(r'^register_handle/$', views.register_handle, name='register_handle'), # 用
 ```
 然后就完成注册功能了。之后需要实现发送激活邮件。
 
+
+# <a id="3">3，书籍商品模块</a>
+## 1，渲染首页功能（书籍表结构设计）
+完成注册功能以后，点击注册按钮应该跳转到首页。所以我们把首页index.html完成。先新建一个books app。
+```
+$ python manage.py startapp books
+```
+在配置文件中添加books app
+```
+# bookstore/settings.py
+INSTALLED_APPS = (
+    ...
+    'users', # 用户模块
+    'books', # 商品模块
+)
+```
+然后设计models，也就是books模块的表结构。这里我们先介绍一下富文本编辑器，因为编辑商品详情页需要使用富文本编辑器。
+
+### 富文本编辑器应用到项目中
+
+- 在settings.py中为INSTALLED_APPS添加编辑器应用
+``` python
+# settings.py
+INSTALLED_APPS = (
+    ...
+    'tinymce',
+)
+```
+
+- 在settings.py中添加编辑配置项
+``` python
+TINYMCE_DEFAULT_CONFIG = {
+    'theme': 'advanced',
+    'width': 600,
+    'height': 400,
+}
+```
+
+- 在根urls.py中配置
+``` python
+urlpatterns = [
+    ...
+    url(r'^tinymce/', include('tinymce.urls')),
+]
+```
+
+- 在应用中定义模型的属性
+``` python
+from django.db import models
+from tinymce.models import HTMLField
+
+class HeroInfo(models.Model):
+    ...
+    hcontent = HTMLField()
+```
+- 在后台管理界面中，就会显示为富文本编辑器，而不是多行文本框
+
+下面在我们的应用中添加富文本编辑器。
+然后我们就可以设计我们的商品表结构了，我们可以通过观察detail.html来设计表结构。
+我们先把一些常用的常量存储到books/enums.py文件中
+```
+PYTHON = 1
+JAVASCRIPT = 2
+ALGORITHMS = 3
+MACHINELEARNING = 4
+OPERATINGSYSTEM = 5
+DATABASE = 6
+
+BOOKS_TYPE = {
+    PYTHON: 'Python',
+    JAVASCRIPT: 'Javascript',
+    ALGORITHMS: '数据结构与算法',
+    MACHINELEARNING: '机器学习',
+    OPERATINGSYSTEM: '操作系统',
+    DATABASE: '数据库',
+}
+
+OFFLINE = 0
+ONLINE = 1
+
+STATUS_CHOICE = {
+    OFFLINE: '下线',
+    ONLINE: '上线'
+}
+```
+然后再来设计表结构：
+```
+from db.base_model import BaseModel
+from tinymce.models import HTMLField
+from books.enums import *
+# Create your models here.
+class Books(BaseModel):
+    '''商品模型类'''
+    books_type_choices = ((k, v) for k,v in BOOKS_TYPE.items())
+    status_choices = ((k, v) for k,v in STATUS_CHOICE.items())
+    type_id = models.SmallIntegerField(default=PYTHON, choices=books_type_choices, verbose_name='商品种类')
+    name = models.CharField(max_length=20, verbose_name='商品名称')
+    desc = models.CharField(max_length=128, verbose_name='商品简介')
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='商品价格')
+    unite = models.CharField(max_length=20, verbose_name='商品单位')
+    stock = models.IntegerField(default=1, verbose_name='商品库存')
+    sales = models.IntegerField(default=0, verbose_name='商品销量')
+    detail = HTMLField(verbose_name='商品详情')
+    image = models.ImageField(upload_to='books', verbose_name='商品图片')
+    status = models.SmallIntegerField(default=ONLINE, choices=status_choices, verbose_name='商品状态')
+
+    objects = BooksManager()
+
+    class Meta:
+        db_table = 's_books'
+```
+同样，我们这里再写一下BooksManager()，有一些基本功能在这里抽象出来。
+
+```
+class BooksManager(models.Manager):
+    '''商品模型管理器类'''
+    # sort='new' 按照创建时间进行排序
+    # sort='hot' 按照商品销量进行排序
+    # sort='price' 按照商品的价格进行排序
+    # sort= 按照默认顺序排序
+    def get_books_by_type(self, type_id, limit=None, sort='default'):
+        '''根据商品类型id查询商品信息'''
+        if sort == 'new':
+            order_by = ('-create_time',)
+        elif sort == 'hot':
+            order_by = ('-sales', )
+        elif sort == 'price':
+            order_by = ('price', )
+        else:
+            order_by = ('-pk', ) # 按照primary key降序排列。
+
+        # 查询数据
+        books_li = self.filter(type_id=type_id).order_by(*order_by)
+
+        # 查询结果集的限制
+        if limit:
+            books_li = books_li[:limit]
+        return books_li
+
+    def get_books_by_id(self, books_id):
+        '''根据商品的id获取商品信息'''
+        try:
+            books = self.get(id=books_id)
+        except self.model.DoesNotExist:
+            # 不存在商品信息
+            books = None
+        return books
+```
+做数据库迁移。
+```
+$ python manage.py makemigrations books
+$ python manage.py migrate
+```
+好，接下来我们就可以将首页index.html渲染出来了。现在根urls.py中配置url。
+```
+url(r'^', include('books.urls', namespace='books')), # 商品模块
+```
+然后在books app中的urls.py中配置url。
+```
+from django.conf.urls import url
+from books import views
+
+urlpatterns = [
+    url(r'^$', views.index, name='index'), # 首页
+]
+```
+
